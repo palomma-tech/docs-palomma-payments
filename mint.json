@@ -1,78 +1,86 @@
 {
   "$schema": "https://mintlify.com/schema.json",
-  "name": "Starter Kit",
+  "name": "Palomma",
   "logo": {
-    "dark": "/logo/dark.svg",
-    "light": "/logo/light.svg"
+    "dark": "/logo/palomma-logo.png",
+    "light": "/logo/palomma-logo.png"
   },
   "favicon": "/favicon.svg",
   "colors": {
-    "primary": "#0D9373",
-    "light": "#07C983",
-    "dark": "#0D9373",
+    "primary": "#4012AB",
+    "light": "#8F62E5",
+    "dark": "#4012AB",
     "anchors": {
-      "from": "#0D9373",
-      "to": "#07C983"
+      "from": "#161236",
+      "to": "#4012ab"
     }
   },
+  "openapi": ["/openapi.yml"],
   "topbarLinks": [
     {
       "name": "Support",
-      "url": "mailto:hi@mintlify.com"
+      "url": "mailto:comercios@palomma.com"
     }
   ],
   "topbarCtaButton": {
     "name": "Dashboard",
     "url": "https://dashboard.mintlify.com"
   },
-  "tabs": [
-    {
-      "name": "API Reference",
-      "url": "api-reference"
-    }
-  ],
   "anchors": [
     {
-      "name": "Documentation",
-      "icon": "book-open-cover",
-      "url": "https://mintlify.com/docs"
-    },
-    {
-      "name": "Community",
-      "icon": "slack",
-      "url": "https://mintlify.com/community"
-    },
-    {
-      "name": "Blog",
-      "icon": "newspaper",
-      "url": "https://mintlify.com/blog"
+      "name": "Registration",
+      "icon": "clipboard",
+      "url": "https://www.palomma.com/"
     }
   ],
   "navigation": [
     {
-      "group": "Get Started",
-      "pages": ["introduction", "quickstart", "development"]
-    },
-    {
-      "group": "Essentials",
-      "pages": ["essentials/markdown", "essentials/code", "essentials/images", "essentials/settings", "essentials/navigation"]
+      "group": "General",
+      "pages": ["general/about", "general/onboarding"]
     },
     {
       "group": "API Documentation",
-      "pages": ["api-reference/introduction"]
+      "pages": [
+        "api-documentation/introduction",
+        {
+          "group": "Endpoints",
+          "pages": [
+            {
+              "group": "Customers",
+              "pages": [
+                "api-documentation/customers/createCustomer",
+                "api-documentation/customers/getCustomer",
+                "api-documentation/customers/getAllCustomers"
+              ]
+            },
+            {
+              "group": "Payment Methods",
+              "pages": [
+                "api-documentation/paymentMethods/createPaymentMethod",
+                "api-documentation/paymentMethods/getAllPaymentMethods",
+                "api-documentation/paymentMethods/getPaymentMethod"
+              ]
+            },
+            {
+              "group": "Payment Requests",
+              "pages": [
+                "api-documentation/paymentRequests/createPaymentRequest",
+                "api-documentation/paymentRequests/getAllPaymentRequests",
+                "api-documentation/paymentRequests/getPaymentRequest"
+              ]
+            }
+          ]
+        },
+        "api-documentation/types"
+      ]
     },
     {
-      "group": "Endpoint Examples",
-      "pages": [
-        "api-reference/endpoint/get",
-        "api-reference/endpoint/create",
-        "api-reference/endpoint/delete"
-      ]
+      "group": "Webhooks",
+      "pages": ["webhooks/explanation"]
     }
   ],
   "footerSocials": {
-    "twitter": "https://twitter.com/mintlify",
-    "github": "https://github.com/mintlify",
-    "linkedin": "https://www.linkedin.com/company/mintsearch"
+    "instagram": "https://www.instagram.com/palommapay/",
+    "linkedin": "https://www.linkedin.com/company/palomma/"
   }
 }

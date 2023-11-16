@@ -1,0 +1,373 @@
+openapi: 3.0.1
+info:
+  title: Palomma API
+  version: 1.0.0
+servers:
+  - url: https://prod.api.palomma.com/v1
+    description: Production server
+  - url: https://sandbox.api.palomma.com/v1
+    description: Sandbox server
+
+paths:
+  /customers:
+    post:
+      summary: Creates a new Customer
+      description: Creates a new Customer from the information sent in the body.
+      operationId: createCustomer
+      tags:
+        - Customers
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                name:
+                  type: string
+                  description: Full name of the customer.
+                documentType:
+                  type: string
+                  enum: ["cc", "ce", "nit"]
+                  description: Type of identification document (cc, ce, nit).
+                documentNumber:
+                  type: string
+                  description: Identification document number.
+                email:
+                  type: string
+                  description: Email address of the customer.
+              required:
+                - name
+                - documentType
+                - documentNumber
+                - email
+      responses:
+        "201":
+          description: Customer created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    get:
+      summary: List Customers
+      description: Returns a list of all Customer objects corresponding to the merchant.
+      operationId: listCustomers
+      tags:
+        - Customers
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of customers.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Customer"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /customers/{customerId}:
+    get:
+      summary: Retrieve a Customer
+      description: Retrieves a Customer using the ID specified.
+      operationId: getCustomerById
+      tags:
+        - Customers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier of the customer.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Customer not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /paymentMethods:
+    post:
+      summary: Create Payment Method
+      description: Creates a new Payment Method from the information sent in the body.
+      operationId: createPaymentMethod
+      tags:
+        - Payment Methods
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                  description: Unique identifier of the customer.
+                bank:
+                  $ref: "#/components/schemas/Bank"
+                accountType:
+                  type: string
+                  enum: ["savings", "checking"]
+                  description: Type of bank account (savings or checking).
+                accountNumber:
+                  type: string
+                  description: Bank account number.
+              required:
+                - customerId
+                - bank
+                - accountType
+                - accountNumber
+      responses:
+        "201":
+          description: Payment Method created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentMethod"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
+components:
+  schemas:
+    Customer:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this customer.
+          example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
+        name:
+          type: string
+          description: First and last name for a natural person, and company name for a juridical person.
+          example: "Pepito Perez"
+        documentType:
+          type: string
+          enum: ["cc", "ce", "nit"]
+          description: Colombian ID type for customer.
+          example: "cc"
+        documentNumber:
+          type: string
+          description: Colombian ID number for customer.
+          example: "200220422"
+        email:
+          type: string
+          description: Customer’s email.
+          example: "pepito@perez.com"
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the customer was created.
+          example: "2023-10-26T21:28:34.152Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the customer was updated.
+          example: "2023-10-26T21:28:34.152Z"
+    Bank:
+      type: string
+      enum:
+        - santander
+        - coofinep
+        - avvillas
+        - cotrafa
+        - confiar
+        - union
+        - nequi
+        - bancoagrario
+        - bancoomeva
+        - bancamia
+        - coopcentral
+        - citibank
+        - bancodeoccidente
+        - falabella
+        - bancodebogota
+        - bancocajasocial
+        - serfinanza
+        - cfa
+        - coltefinanciera
+        - pichincha
+        - iris
+        - ban100
+        - bancopopular
+        - daviplata
+        - bancolombia
+        - finandina
+        - scotiabankcolpatria
+        - gnbsudameris
+        - itau
+        - bbva
+        - davivienda
+        - mibanco
+        - multibank
+        - mundomujer
+        - procreditcolombia
+        - bancow
+        - bancoldex
+        - juriscoop
+        - itauhelm
+        - jpmorgancolombia
+      description: Enum of all available banks for direct debit through the Palomma API.
+    PaymentMethod:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this payment method.
+          example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
+        status:
+          type: string
+          enum: ["active", "error"]
+          description: Status of the payment method.
+          example: "active"
+        customerId:
+          type: string
+          description: Reference to customer who owns this payment method.
+          example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        type:
+          type: string
+          description: Always "bankAccount".
+          example: "bankAccount"
+        bankAccount:
+          $ref: "#/components/schemas/BankAccount"
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment method was created.
+          example: "2023-10-26T21:28:34.152Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment method was last updated.
+          example: "2023-10-26T21:28:34.152Z"
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
