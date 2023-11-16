@@ -356,6 +356,171 @@ paths:
                 properties:
                   message:
                     type: string
+  /paymentRequests:
+    post:
+      summary: Create Payment Request
+      description: Creates a new Payment Request from the information sent in the body.
+      operationId: createPaymentRequest
+      tags:
+        - Payment Requests
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                paymentMethodId:
+                  type: string
+                  description: Unique identifier of the payment method.
+                amount:
+                  type: number
+                  description: Amount to be charged.
+              required:
+                - paymentMethodId
+                - amount
+      responses:
+        "201":
+          description: Payment Request created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    get:
+      summary: List Payment Requests
+      description: Returns a list of all Payment Request objects corresponding to the merchant.
+      operationId: listPaymentRequests
+      tags:
+        - Payment Requests
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of payment requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PaymentRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /paymentRequests/{paymentRequestId}:
+    get:
+      summary: Retrieve a Payment Request
+      description: Retrieves a Payment Request using the ID specified.
+      operationId: getPaymentRequestById
+      tags:
+        - Payment Requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: paymentRequestId
+          in: path
+          required: true
+          description: Unique identifier of the payment request.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payment Request retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PaymentRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payment Request not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
 components:
   schemas:
@@ -507,6 +672,60 @@ components:
         - itauhelm
         - jpmorgancolombia
       description: Enum of all available banks for direct debit through the Palomma API.
+    PaymentRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this payment request.
+          example: "0697129c-26e2-42f1-a000-dc60878d5588"
+        status:
+          type: string
+          enum: ["pending", "processing", "approved", "error"]
+          description: Current status of the payment request.
+          example: "approved"
+        customerId:
+          type: string
+          description: Reference to the customer who owns the payment method from which the payment request was created.
+          example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        paymentMethodId:
+          type: string
+          description: Reference to the payment method from which the payment request was created.
+          example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
+        paymentMethodDetails:
+          $ref: "#/components/schemas/PaymentMethodDetails"
+        currency:
+          type: string
+          description: Always "cop" (Colombian Pesos).
+          example: "cop"
+        amount:
+          type: number
+          description: Amount to collect from the customer's payment method, with no more than two decimal places.
+          example: 10000
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment request was created.
+          example: “2023-10-26T21:28:34.152Z”
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment request was last updated.
+          example: “2023-10-26T21:28:34.152Z”
+    PaymentMethodDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: Always "bankAccount".
+          example: "bankAccount"
+          enum:
+            - bankAccount
+        bankAccount:
+          $ref: "#/components/schemas/BankAccount"
 
   securitySchemes:
     bearerAuth:
