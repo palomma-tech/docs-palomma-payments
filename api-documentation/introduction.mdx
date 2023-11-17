@@ -1,71 +1,41 @@
 ---
 title: Introduction
-description: 'Welcome to the home of your new documentation'
+description: "General information of Palomma API"
 ---
 
-<img
-  className="block dark:hidden"
-  src="/images/hero-light.svg"
-  alt="Hero Light"
-/>
-<img
-  className="hidden dark:block"
-  src="/images/hero-dark.svg"
-  alt="Hero Dark"
-/>
+## Base URLs
 
-## Setting up
+We have a sandbox and production environment. You can use the sandbox environment, which doesn’t touch real money, for testing changes before deploying them to a stage that uses our production environment:
 
-The first step to world-class documentation is setting up your editing environnments.
+<Tip>
+**Environnments**:
 
-<CardGroup cols={2}>
-  <Card
-    title="Edit Your Docs"
-    icon="pen-to-square"
-    href="https://mintlify.com/docs/quickstart"
-  >
-    Get your docs set up locally for easy development
-  </Card>
-  <Card
-    title="Preview Changes"
-    icon="image"
-    href="https://mintlify.com/docs/development"
-  >
-    Preview your changes before you push to make sure they're perfect
-  </Card>
-</CardGroup>
+Production
 
-## Make it yours
+```jsx
+https://prod.api.palomma.com/v1
+```
 
-Update your docs to your brand and add valuable content for the best user conversion.
+Sandbox
 
-<CardGroup cols={2}>
-  <Card
-    title="Customize Style"
-    icon="palette"
-    href="https://mintlify.com/docs/settings/global"
-  >
-    Customize your docs to your company's colors and brands
-  </Card>
-  <Card
-    title="Reference APIs"
-    icon="code"
-    href="https://mintlify.com/docs/api-playground/openapi"
-  >
-    Automatically generate endpoints from an OpenAPI spec
-  </Card>
-  <Card
-    title="Add Components"
-    icon="screwdriver-wrench"
-    href="https://mintlify.com/docs/components/accordion"
-  >
-    Build interactive features and designs to guide your users
-  </Card>
-  <Card
-    title="Get Inspiration"
-    icon="stars"
-    href="https://mintlify.com/showcase"
-  >
-    Check out our showcase of our favorite documentation
-  </Card>
-</CardGroup>
+```jsx
+https://sandbox.api.palomma.com/v1
+```
+
+</Tip>
+
+## Authentication
+
+You should have received an API key from the onboarding process. To authenticate your merchant, include an Authentication header on each request:
+
+```jsx
+Authentication: `Bearer ${apiKey}`;
+```
+
+## Endpoints
+
+The Palomma direct debit API relies on 3 main concepts: [Customers](/api-documentation/customers/createCustomer), [Payment Methods](/api-documentation/paymentMethods/createPaymentMethod), and [Payment Request](/api-documentation/paymentRequests/createpaymentRequest). Before using the API to generate a direct debit payment request, a merchant begins by creating a customer, then adds a payment method to the customer, and finally creates a payment request from the payment method.
+
+`Customers` contain personal information that identifies an individual, such as email, government ID, etc. They can have multiple `Payment Methods`, which contain payment information such as bank account information, associated to them. `Payment Requests`, which contain information about a specific charge from the merchant to a customer’s payment method, are initiated from an active payment method that was created by the merchant that is trying to charge the customer.
+
+The endpoints below allow creation, querying and fetching of each one of the main API concepts.
