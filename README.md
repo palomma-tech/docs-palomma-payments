@@ -1,6 +1,6 @@
 # Palomma Docs
 
-This repository powers the content behind Palomma's docs at (to be defined).
+This repository powers the content behind Palomma's docs at https://docs.directdebit.palomma.com.
 
 ### 👩‍💻 Development
 
