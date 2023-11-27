@@ -21,10 +21,53 @@ Every webhook Palomma sends is signed to verify the integrity of the data being 
 The recommended flow is the following:
 
 1. Retrieve the request headers `X-Encoded-Data` and `X-Signature`.
-2. `X-Encoded-Data` is the base64 encoding of the webhook’s payload (the body of the POST request). Decode it, parse it into a JSON object, and verify that the resulting JSON object is equal to the body of the webhook request. If this check fails, the signature is invalid.
-3. `X-Signature` is an HMAC with the SHA256 hash function of `X-Encoded-Data`. Compute an HMAC-SHA-256 of `X-Encoded-Data` with the `integrityKey` assigned to you, and compare it to `X-Signature`. If the computed signature and `X-Signature` are not equal, the signature is invalid.
+2. `X-Signature` is an HMAC with the SHA256 hash function of `X-Encoded-Data`. Compute an HMAC-SHA-256 of `X-Encoded-Data` with the `integrityKey` assigned to you, and compare it to `X-Signature`. If the computed signature and `X-Signature` are not equal, the signature is invalid.
+3. `X-Encoded-Data` is the base64 encoding of the webhook’s payload (the body of the POST request). Decode it, parse it into a JSON object, and verify that the resulting JSON object is equal to the body of the webhook request. If this check fails, the signature is invalid.
 
 If the above checks passed, you can be confident that the data was sent by Palomma and that it wasn’t tampered with, as long as the `integrityKey` hasn’t been compromised, since only Palomma and the merchant have access to the `integrityKey` and it’s [implausible to generate the HMAC-SHA-256 of a message, secret key pair without the secret key](https://en.wikipedia.org/wiki/HMAC). You should only proceed to processing the request if the signature is deemed valid. Otherwise, return an error and ignore the request.
+
+### Example
+
+Here's an example of the steps described above using Node.js.
+
+```javascript webhookExample.js
+const dotenv = require("dotenv");
+const crypto = require("crypto");
+
+app.post("/", (req, res) => {
+  try {
+    // Retrieve information from headers to perform validation.
+    const encoded_data = req.headers["x-encoded-data"];
+    const signature = req.headers["x-signature"];
+
+    // The integrity key provided by Palomma.
+    const integrityKey = process.env.PALOMMA_INTEGRITY_KEY;
+
+    // Create an HMAC for validation purposes.
+    const signatureRequest = crypto
+      .createHmac("sha256", integrityKey)
+      .update(encoded_data)
+      .digest("hex");
+
+    // Decode the base64-encoded string.
+    const decodedData = Buffer.from(encoded_data, "base64").toString("utf-8");
+
+    // Check if the signature matches and the decoded data is equal to the webhook request body.
+    if (
+      signature === signatureRequest &&
+      decodedData === JSON.stringify(req.body)
+    ) {
+      // Code to execute when a valid webhook is received.
+      res.status(200).json({ msg: "Success: Webhook is valid!" });
+    } else {
+      // Response sent when the webhook is invalid.
+      res.status(401).json({ msg: "Error: Webhook is NOT valid!" });
+    }
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+```
 
 ## Duplicate Requests
 
