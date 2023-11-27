@@ -198,24 +198,55 @@ paths:
           application/json:
             schema:
               type: object
-              properties:
-                customerId:
-                  type: string
-                  description: Unique identifier of the customer.
-                bank:
-                  $ref: "#/components/schemas/Bank"
-                accountType:
-                  type: string
-                  enum: ["savings", "checking"]
-                  description: Type of bank account (savings or checking).
-                accountNumber:
-                  type: string
-                  description: Bank account number.
-              required:
-                - customerId
-                - bank
-                - accountType
-                - accountNumber
+              oneOf:
+                - properties:
+                    customerId:
+                      type: string
+                      description: Unique identifier of the customer.
+                    type:
+                      type: string
+                      enum: ["bankAccount"]
+                    bank:
+                      $ref: "#/components/schemas/Bank"
+                    accountType:
+                      type: string
+                      enum: ["savings", "checking"]
+                      description: Type of bank account (savings or checking).
+                    accountNumber:
+                      type: string
+                      description: Bank account number.
+                  required:
+                    - customerId
+                    - type
+                    - bank
+                    - accountType
+                    - accountNumber
+                - properties:
+                    customerId:
+                      type: string
+                    type:
+                      type: string
+                      enum: ["bancolombiaInstant"]
+                    redirectUrl:
+                      type: string
+                      description: URL for redirection.
+                  required:
+                    - customerId
+                    - type
+                    - redirectUrl
+                - properties:
+                    customerId:
+                      type: string
+                    type:
+                      type: string
+                      enum: ["nequiInstant"]
+                    phoneNumber:
+                      type: string
+                      description: Phone number for Nequi account.
+                  required:
+                    - customerId
+                    - type
+                    - phoneNumber
       responses:
         "201":
           description: Payment Method created successfully.
@@ -569,21 +600,31 @@ components:
           example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
         status:
           type: string
-          enum: ["active", "error"]
-          description: Status of the payment method.
+          enum: ["pending", "active", "error"]
+          description: >
+            Status of the payment method. 'pending' indicates the payment method is not yet available for payment requests. 
+            'active' indicates the payment method is available for payment requests. 
+            'error' indicates an error confirming the bank account, usually when bank info is incorrect or customer info doesn’t match with the bank account owner’s.
           example: "active"
         customerId:
           type: string
-          description: Reference to customer who owns this payment method.
+          description: Reference to the customer who owns this payment method.
           example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
         type:
           type: string
-          description: Always "bankAccount".
+          enum: ["bankAccount", "bancolombiaInstant", "nequiInstant"]
+          description: >
+            Type of payment method created. Can be "bankAccount" for an account that transacts through traditional slower banking rails, 
+            "bancolombiaInstant", or "nequiInstant" for tokenized instant payment accounts.
           example: "bankAccount"
         bankAccount:
           $ref: "#/components/schemas/BankAccount"
+        bancolombiaInstant:
+          $ref: "#/components/schemas/BancolombiaInstant"
+        nequiInstant:
+          $ref: "#/components/schemas/NequiInstant"
         createdAt:
           type: string
           format: date-time
@@ -594,6 +635,45 @@ components:
           format: date-time
           description: ISO string when the payment method was last updated.
           example: "2023-10-26T21:28:34.152Z"
+    Affiliate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the linked Bancolombia account owner.
+          example: "Pepito Perez"
+        documentType:
+          type: string
+          description: Document type for linked Bancolombia account owner.
+          example: "cc"
+        documentNumber:
+          type: string
+          description: Document number for linked Bancolombia account owner.
+          example: "200220422"
+        accountType:
+          type: string
+          description: Account type for linked Bancolombia account.
+          example: "savings"
+        accountNumber:
+          type: string
+          description: Last four digits of account number for linked Bancolombia account.
+          example: "123456789"
+    BancolombiaInstant:
+      type: object
+      properties:
+        authUrl:
+          type: string
+          description: Link for authorization. Only available while payment method status is "pending".
+          example: "https://www.bancolombia.com/..."
+        affiliate:
+          $ref: "#/components/schemas/Affiliate"
+    NequiInstant:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: Account number for linked Nequi Account.
+          example: "3298779391"
     BankAccount:
       type: object
       properties:
@@ -720,12 +800,29 @@ components:
       properties:
         type:
           type: string
-          description: Always "bankAccount".
+          description: Type of payment method created. Can be "bankAccount" for an account that transacts through traditional slower banking rails, or "bancolombiaInstant", "nequiInstant" for tokenized instant payment accounts.
           example: "bankAccount"
           enum:
             - bankAccount
+            - bancolombiaInstant
+            - nequiInstant
         bankAccount:
           $ref: "#/components/schemas/BankAccount"
+        bancolombiaInstant:
+          type: object
+          nullable: true
+          description: Information about the Bancolombia account associated to this payment method. Only present when payment method type is "bancolombiaInstant".
+          properties:
+            affiliate:
+              $ref: "#/components/schemas/Affiliate"
+        nequiInstant:
+          type: object
+          nullable: true
+          description: Information about the Nequi account associated to this payment method. Only present when payment method type is "nequiInstant".
+          properties:
+            phoneNumber:
+              type: string
+              example: "3298779391"
 
   securitySchemes:
     bearerAuth:
