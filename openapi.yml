@@ -795,6 +795,49 @@ components:
           format: date-time
           description: ISO string when the payment request was last updated.
           example: “2023-10-26T21:28:34.152Z”
+        approvedDetails:
+          $ref: "#/components/schemas/ApprovedPaymentRequest"
+        errorDetails:
+          $ref: "#/components/schemas/ErroredPaymentRequest"
+    ApprovedPaymentRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["approved"]
+          description: Indicates the payment request is approved.
+          example: "approved"
+        approvedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment request was approved.
+          example: "2023-10-26T21:28:34.152Z"
+        paidAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment request was paid out to the merchant, or null for unpaid transactions.
+          example: "2023-10-26T21:28:34.152Z"
+    ErroredPaymentRequest:
+      type: object
+      properties:
+        status:
+          type: string
+          enum: ["error"]
+          description: Indicates the payment request resulted in an error.
+          example: "error"
+        errorCode:
+          type: string
+          description: Error code returned by financial institution that processed the transaction.
+          example: "D23"
+        errorMessage:
+          type: string
+          description: Description of the error in the transaction from the processing financial institution.
+          example: "Not enough funds"
+        errorAt:
+          type: string
+          format: date-time
+          description: ISO string when the payment request resolved to an error.
+          example: “2023-10-26T21:28:34.152Z”
     PaymentMethodDetails:
       type: object
       properties:
