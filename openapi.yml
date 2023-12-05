@@ -635,6 +635,15 @@ components:
           format: date-time
           description: ISO string when the payment method was last updated.
           example: "2023-10-26T21:28:34.152Z"
+    BancolombiaInstant:
+      type: object
+      properties:
+        authUrl:
+          type: string
+          description: Link for authorization. Only available while payment method status is "pending".
+          example: "https://www.bancolombia.com/..."
+        affiliate:
+          $ref: "#/components/schemas/Affiliate"
     Affiliate:
       type: object
       properties:
@@ -657,16 +666,7 @@ components:
         accountNumber:
           type: string
           description: Last four digits of account number for linked Bancolombia account.
-          example: "123456789"
-    BancolombiaInstant:
-      type: object
-      properties:
-        authUrl:
-          type: string
-          description: Link for authorization. Only available while payment method status is "pending".
-          example: "https://www.bancolombia.com/..."
-        affiliate:
-          $ref: "#/components/schemas/Affiliate"
+          example: "*1234"
     NequiInstant:
       type: object
       properties:
@@ -802,11 +802,6 @@ components:
     ApprovedPaymentRequest:
       type: object
       properties:
-        status:
-          type: string
-          enum: ["approved"]
-          description: Indicates the payment request is approved.
-          example: "approved"
         approvedAt:
           type: string
           format: date-time
@@ -820,11 +815,6 @@ components:
     ErroredPaymentRequest:
       type: object
       properties:
-        status:
-          type: string
-          enum: ["error"]
-          description: Indicates the payment request resulted in an error.
-          example: "error"
         errorCode:
           type: string
           description: Error code returned by financial institution that processed the transaction.
