@@ -1010,6 +1010,175 @@ paths:
                 properties:
                   message:
                     type: string
+  /payoutRequests:
+    post:
+      summary: Create Payout Request
+      description: Creates a new Payout Request from the information sent in the body.
+      operationId: createPayoutRequest
+      tags:
+        - Payout Requests
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                merchantAccountId:
+                  type: string
+                  description: Unique identifier of the merchant account. Optional.
+                payoutTargetId:
+                  type: string
+                  description: Unique identifier of the payout target. Required.
+                amount:
+                  type: number
+                  description: Amount to be paid out. Required.
+              required:
+                - payoutTargetId
+                - amount
+      responses:
+        "201":
+          description: Payout Request created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    get:
+      summary: List Payout Requests
+      description: Returns a list of all Payout Request objects corresponding to the merchant.
+      operationId: listPayoutRequests
+      tags:
+        - Payout Requests
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of payout requests.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayoutRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payoutRequests/{payoutRequestId}:
+    get:
+      summary: Retrieve a Payout Request
+      description: Retrieves a Payout Request using the ID specified.
+      operationId: getPayoutRequestById
+      tags:
+        - Payout Requests
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: payoutRequestId
+          in: path
+          required: true
+          description: Unique identifier of the payout request.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payout Request retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payout Request not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 components:
   schemas:
     Customer:
@@ -1490,6 +1659,78 @@ components:
           format: date-time
           description: ISO string when the payout target was last updated.
           example: "2023-10-26T21:28:34.152Z"
+    PayoutRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this payout request.
+          example: "0697129c-26e2-42f1-a000-dc60878d5588"
+        status:
+          type: string
+          enum: ["processing", "approved", "declined"]
+          description: Current status of the payout request.
+          example: "approved"
+        statusMessage:
+          type: string
+          description: Further detail on the status of the payout request.
+        merchantAccountId:
+          type: string
+          description: Reference to the merchant account.
+        customerId:
+          type: string
+          description: Reference to the customer who owns the payment method.
+          example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        payoutTargetId:
+          type: string
+          description: Reference to the payout target.
+          example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
+        payoutTargetDetails:
+          $ref: "#/components/schemas/PayoutTargetDetails"
+        currency:
+          type: string
+          enum: ["cop"]
+          description: Always "cop" (Colombian Pesos).
+          example: "cop"
+        amount:
+          type: number
+          description: Amount to collect from the payout target.
+          example: 10000
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the payout request was created.
+          example: "2023-10-26T21:28:34.152Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payout request was last updated.
+          example: "2023-10-26T21:28:34.152Z"
+    PayoutTargetDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          enum: ["bankAccount"]
+          description: Type of the payout target.
+          example: "bankAccount"
+        bankAccount:
+          type: object
+          properties:
+            bank:
+              $ref: "#/components/schemas/Bank"
+            accountType:
+              type: string
+              enum: ["savings", "checking"]
+              description: Type of bank account.
+              example: "savings"
+            accountNumber:
+              type: string
+              description: Bank account number.
+              example: "123456789"
   securitySchemes:
     bearerAuth:
       type: http

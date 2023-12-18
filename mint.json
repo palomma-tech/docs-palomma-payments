@@ -94,9 +94,9 @@
             {
               "group": "Payout Requests",
               "pages": [
-                "api-documentation/customers/createCustomer",
-                "api-documentation/customers/getCustomer",
-                "api-documentation/customers/getAllCustomers"
+                "api-documentation/payoutRequests/createPayoutRequest",
+                "api-documentation/payoutRequests/getAllPayoutRequests",
+                "api-documentation/payoutRequests/getPayoutRequest"
               ]
             }
           ]
