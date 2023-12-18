@@ -831,7 +831,185 @@ paths:
                 properties:
                   message:
                     type: string
-
+  /payoutTargets:
+    post:
+      summary: Create Payout Target
+      description: Creates a new Payout Target from the information sent in the body.
+      operationId: createPayoutTarget
+      tags:
+        - Payout Targets
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                customerId:
+                  type: string
+                  description: Unique identifier of the customer.
+                type:
+                  type: string
+                  enum: ["bankAccount"]
+                  description: Type of the payout target.
+                bank:
+                  $ref: "#/components/schemas/Bank"
+                accountType:
+                  type: string
+                  enum: ["savings", "checking"]
+                  description: Type of bank account.
+                accountNumber:
+                  type: string
+                  description: Bank account number.
+              required:
+                - customerId
+                - type
+                - bank
+                - accountType
+                - accountNumber
+      responses:
+        "200":
+          description: Payout Target created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutTarget"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+    get:
+      summary: List Payout Targets
+      description: Returns a list of all Payout Target objects corresponding to the merchant.
+      operationId: listPayoutTargets
+      tags:
+        - Payout Targets
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: A list of payout targets.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayoutTarget"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payoutTargets/{payoutTargetId}:
+    get:
+      summary: Retrieve a Payout Target
+      description: Retrieves a Payout Target using the ID specified.
+      operationId: getPayoutTargetById
+      tags:
+        - Payout Targets
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: payoutTargetId
+          in: path
+          required: true
+          description: Unique identifier of the payout target.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Payout Target retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutTarget"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payout Target not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 components:
   schemas:
     Customer:
@@ -1272,6 +1450,45 @@ components:
           type: string
           format: date-time
           description: ISO string when the charge was last updated.
+          example: "2023-10-26T21:28:34.152Z"
+    PayoutTarget:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this payout target.
+          example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
+        status:
+          type: string
+          enum: ["pending", "active", "cancelled"]
+          description: Status of the payout target.
+          example: "active"
+        statusMessage:
+          type: string
+          description: Further detail on the status of the payout target.
+        customerId:
+          type: string
+          description: Reference to the customer who owns this payout target.
+          example: "e79a0b74-3aba-4149-9f74-0bb5791a6ee6"
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        type:
+          type: string
+          enum: ["bankAccount"]
+          description: Type of the payout target.
+          example: "bankAccount"
+        bankAccount:
+          $ref: "#/components/schemas/BankAccount"
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the payout target was created.
+          example: "2023-10-26T21:28:34.152Z"
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payout target was last updated.
           example: "2023-10-26T21:28:34.152Z"
   securitySchemes:
     bearerAuth:

@@ -55,8 +55,8 @@
               "group": "Customers",
               "pages": [
                 "api-documentation/customers/createCustomer",
-                "api-documentation/customers/getCustomer",
-                "api-documentation/customers/getAllCustomers"
+                "api-documentation/customers/getAllCustomers",
+                "api-documentation/customers/getCustomer"
               ]
             },
             {
@@ -86,9 +86,9 @@
             {
               "group": "Payout Targets",
               "pages": [
-                "api-documentation/customers/createCustomer",
-                "api-documentation/customers/getCustomer",
-                "api-documentation/customers/getAllCustomers"
+                "api-documentation/payoutTargets/createPayoutTarget",
+                "api-documentation/payoutTargets/getAllPayoutTargets",
+                "api-documentation/payoutTargets/getPayoutTarget"
               ]
             },
             {
