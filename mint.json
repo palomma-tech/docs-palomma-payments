@@ -45,6 +45,13 @@
           "group": "Endpoints",
           "pages": [
             {
+              "group": "Merchant Accounts",
+              "pages": [
+                "api-documentation/merchantAccounts/getListOfAllMerchants",
+                "api-documentation/merchantAccounts/getMerchantAccount"
+              ]
+            },
+            {
               "group": "Customers",
               "pages": [
                 "api-documentation/customers/createCustomer",
@@ -66,6 +73,22 @@
                 "api-documentation/paymentRequests/createPaymentRequest",
                 "api-documentation/paymentRequests/getAllPaymentRequests",
                 "api-documentation/paymentRequests/getPaymentRequest"
+              ]
+            },
+            {
+              "group": "Payout Targets",
+              "pages": [
+                "api-documentation/customers/createCustomer",
+                "api-documentation/customers/getCustomer",
+                "api-documentation/customers/getAllCustomers"
+              ]
+            },
+            {
+              "group": "Payout Requests",
+              "pages": [
+                "api-documentation/customers/createCustomer",
+                "api-documentation/customers/getCustomer",
+                "api-documentation/customers/getAllCustomers"
               ]
             }
           ]
