@@ -60,6 +60,14 @@
               ]
             },
             {
+              "group": "Payment Links",
+              "pages": [
+                "api-documentation/paymentLinks/createPaymentLink",
+                "api-documentation/paymentLinks/getAllPaymentLinks",
+                "api-documentation/paymentLinks/getPaymentLink"
+              ]
+            },
+            {
               "group": "Payment Methods",
               "pages": [
                 "api-documentation/paymentMethods/createPaymentMethod",
