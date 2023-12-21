@@ -146,11 +146,15 @@ paths:
                 email:
                   type: string
                   description: Email address of the customer.
+                phoneNumber:
+                  type: string
+                  description: Phone number of the customer.
               required:
                 - name
                 - documentType
                 - documentNumber
                 - email
+                - phoneNumber
       responses:
         "201":
           description: Customer created successfully.
@@ -1206,6 +1210,10 @@ components:
           type: string
           description: Customer’s email.
           example: "pepito@perez.com"
+        phoneNumber:
+          type: string
+          description: Customer’s phone number (must be a valid Colombian number).
+          example: "3218888888"
         createdAt:
           type: string
           format: date-time
@@ -1226,12 +1234,16 @@ components:
           example: "67d7ae28-bf1d-4ee9-8a47-99358c9e6c32"
         status:
           type: string
-          enum: ["pending", "active", "error"]
+          enum: ["pending", "processing", "active", "error"]
           description: >
             Status of the payment method. 'pending' indicates the payment method is not yet available for payment requests. 
             'active' indicates the payment method is available for payment requests. 
             'error' indicates an error confirming the bank account, usually when bank info is incorrect or customer info doesn’t match with the bank account owner’s.
           example: "active"
+        statusMessage:
+          type: string
+          description: Gives further detail on the status of the payment method. Only present when status is "cancelled", though not required to be present even then.
+          example: "CUSTOMER_CANCELLATION"
         customerId:
           type: string
           description: Reference to the customer who owns this payment method.
@@ -1334,6 +1346,10 @@ components:
           type: string
           description: Customer’s email.
           example: "pepito@perez.com"
+        phoneNumber:
+          type: string
+          description: Customer’s phone number.
+          example: "3218888888"
     Bank:
       type: string
       enum:
@@ -1391,6 +1407,10 @@ components:
           enum: ["pending", "processing", "approved", "error"]
           description: Current status of the payment request.
           example: "approved"
+        statusMessage:
+          type: string
+          description: Gives further detail on the status of the payment request. Only present when status is "declined", though not required to be present even then.
+          example: "NOT_ENOUGH_FUNDS"
         customerId:
           type: string
           description: Reference to the customer who owns the payment method from which the payment request was created.
@@ -1411,6 +1431,14 @@ components:
           type: number
           description: Amount to collect from the customer's payment method, with no more than two decimal places.
           example: 10000
+        amountCollected:
+          type: number
+          description: Amount collected by payment request. Starts at 0 and changes on status change to "approved" or "partial".
+          example: 10000
+        paymentSettlementId:
+          type: string
+          nullable: true
+          description: Reference to payment settlement that paid out amount owed to merchant.
         createdAt:
           type: string
           format: date-time
@@ -1420,39 +1448,6 @@ components:
           type: string
           format: date-time
           description: ISO string when the payment request was last updated.
-          example: “2023-10-26T21:28:34.152Z”
-        approvedDetails:
-          $ref: "#/components/schemas/ApprovedPaymentRequest"
-        errorDetails:
-          $ref: "#/components/schemas/ErroredPaymentRequest"
-    ApprovedPaymentRequest:
-      type: object
-      properties:
-        approvedAt:
-          type: string
-          format: date-time
-          description: ISO string when the payment request was approved.
-          example: "2023-10-26T21:28:34.152Z"
-        paidAt:
-          type: string
-          format: date-time
-          description: ISO string when the payment request was paid out to the merchant, or null for unpaid transactions.
-          example: "2023-10-26T21:28:34.152Z"
-    ErroredPaymentRequest:
-      type: object
-      properties:
-        errorCode:
-          type: string
-          description: Error code returned by financial institution that processed the transaction.
-          example: "D23"
-        errorMessage:
-          type: string
-          description: Description of the error in the transaction from the processing financial institution.
-          example: "Not enough funds"
-        errorAt:
-          type: string
-          format: date-time
-          description: ISO string when the payment request resolved to an error.
           example: “2023-10-26T21:28:34.152Z”
     PaymentMethodDetails:
       type: object
