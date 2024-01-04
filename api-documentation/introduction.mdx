@@ -32,10 +32,18 @@ You should have received an API key from the onboarding process. To authenticate
 Authentication: `Bearer ${apiKey}`;
 ```
 
-## Endpoints
+## Introduction to Palomma API
 
-The Palomma direct debit API relies on 3 main concepts: [Customers](/api-documentation/customers/createCustomer), [Payment Methods](/api-documentation/paymentMethods/createPaymentMethod), and [Payment Request](/api-documentation/paymentRequests/createpaymentRequest). Before using the API to generate a direct debit payment request, a merchant begins by creating a customer, then adds a payment method to the customer, and finally creates a payment request from the payment method.
+Welcome to the Palomma API, a robust platform designed to facilitate both recurring and one-time payments for a seamless financial transaction experience. Our API simplifies the complex processes of handling payments, whether cash-in or cash-out, ensuring flexibility and reliability for your business needs.
 
-`Customers` contain personal information that identifies an individual, such as email, government ID, etc. They can have multiple `Payment Methods`, which contain payment information such as bank account information, associated to them. `Payment Requests`, which contain information about a specific charge from the merchant to a customer’s payment method, are initiated from an active payment method that was created by the merchant that is trying to charge the customer.
+### Core Concepts:
 
-The endpoints below allow creation, querying and fetching of each one of the main API concepts.
+- [Customers](/api-documentation/customers/createCustomer): At the heart of Palomma API is the concept of a "Customer." A customer is created with essential personal information, such as email and government ID, serving as the foundation for all types of transactions. This entity is vital for initiating any payment or payout process.
+
+- [Payment Methods](/api-documentation/paymentMethods/createPaymentMethod) & [Payout Target ](/api-documentation/payoutTargets/createPayoutTarget): For recurring transactions, the next step involves setting up a 'Payment Method' for incoming funds or a 'Payout Target' for outgoing funds. These entities hold critical payment details, such as bank account information. The type of payment method or payout target determines the settlement's immediacy.
+
+- [Payment Request](/api-documentation/paymentRequests/createpaymentRequest) & [Payout Requests](/api-documentation/payoutRequests/createPayoutRequest): Once a customer is associated with the appropriate payment method or payout target, the merchant can initiate 'Payment Requests' for charges or 'Payout Requests' for disbursing funds. These requests are the actionable components that trigger the transaction process.
+
+- [Payment Links](/api-documentation/paymentLinks/createPaymentLink): For certain scenarios, only a customer's information might be necessary to facilitate transactions, simplifying the process further.
+
+It's important to note that each customer can be linked with multiple payment methods and payout targets, allowing flexibility and ease in managing financial transactions. Whether you are dealing with single or recurring transactions, the Palomma API provides a streamlined, secure, and efficient pathway for all your payment processing needs.
