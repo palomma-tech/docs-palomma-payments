@@ -88,6 +88,60 @@ paths:
                   message:
                     type: string
                     description: Description of the internal server error.
+  /payinLinks:
+    post:
+      summary: Creates a new Payin Link
+      description: Creates a new Payin Link from the information sent in the body.
+      operationId: createPayinLink
+      tags:
+        - Payin Links
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/PayinLinkPSE"
+                - $ref: "#/components/schemas/PayinLinkBancolombiaButton"
+                - $ref: "#/components/schemas/PayinLinkNequiButton"
+                - $ref: "#/components/schemas/PayinLinkCard"
+      responses:
+        "201":
+          description: Payin Link created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinLink"
+        "400":
+          description: Bad Request - Invalid input provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to bad request.
+        "401":
+          description: Unauthorized - Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to unauthorized access.
+        "500":
+          description: Internal Server Error - An error occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the internal server error.
 components:
   schemas:
     Customer:
@@ -127,3 +181,303 @@ components:
           type: string
           format: date-time
           description: ISO string when the customer was updated.
+    Bank:
+      type: string
+      description: The list of banks supported by the Palomma API. This defines the acceptable bank names that can be used when creating a Payin Link.
+      enum:
+        - alianza
+        - ban100
+        - bancamia
+        - bancoagrario
+        - avvillas
+        - bbva
+        - bancocajasocial
+        - coopcentral
+        - davivienda
+        - bancodebogota
+        - bancodeoccidente
+        - falabella
+        - finandina
+        - gnbsudameris
+        - itau
+        - jpmorgancolombia
+        - mundomujer
+        - pichincha
+        - bancopopular
+        - santander
+        - serfinanza
+        - union
+        - bancolombia
+        - bancoomeva
+        - cfa
+        - citibank
+        - coltefinanciera
+        - confiar
+        - coofinep
+        - cotrafa
+        - dale
+        - daviplata
+        - iris
+        - lulo
+        - movii
+        - nequi
+        - rappipay
+        - scotiabankcolpatria
+    CustomerDetails:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the customer.
+          example: "LDFLKFL"
+        name:
+          type: string
+          description: The customer's full name.
+          example: "Andres Uribe"
+        documentType:
+          type: string
+          description: The type of identification document provided by the customer (e.g., cc for cédula de ciudadanía).
+          enum:
+            - cc
+            - ce
+            - nit
+            - passport
+            - other
+          example: "cc"
+        documentNumber:
+          type: string
+          description: The identification document number of the customer.
+          example: "1037661022"
+        email:
+          type: string
+          description: The email address of the customer.
+          format: email
+          example: "felipe@palomma.com"
+        phoneNumber:
+          type: string
+          description: The phone number of the customer, must be a valid Colombian number.
+          example: "3218009757"
+    Card:
+      type: object
+      required:
+        - cardNumber
+        - expirationMonth
+        - expirationYear
+        - cvv
+      properties:
+        cardNumber:
+          type: string
+          description: The card number without spaces or dashes.
+          example: "4111111111111111"
+          pattern: '^\d{13,19}$' # Basic validation for 13 to 19 digit numbers
+        expirationMonth:
+          type: string
+          description: The month when the card expires, typically in MM format.
+          example: "12"
+          pattern: "^(0[1-9]|1[0-2])$" # Basic validation for month format
+        expirationYear:
+          type: string
+          description: The year when the card expires, typically in YYYY format.
+          example: "2023"
+          pattern: '^\d{4}$' # Basic validation for 4 digit year
+        cvv:
+          type: string
+          description: The card verification value/code, typically 3 or 4 digits.
+          example: "123"
+          pattern: '^\d{3,4}$' # Basic validation for 3 to 4 digit numbers
+    PayinLinkPSE:
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - amount
+        - type
+        - bank
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Link.
+        description:
+          type: string
+          description: An optional description of the Payin Link.
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant for this Payin Link.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Link is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the payment process.
+        expiration:
+          type: string
+          description: An optional expiration date and time for the Payin Link.
+        amount:
+          type: number
+          description: The amount to be paid through the Payin Link.
+        type:
+          type: string
+          description: The type of the Payin Link, which is 'pse' for this schema.
+          enum:
+            - pse
+        bank:
+          $ref: "#/components/schemas/Bank"
+    PayinLink:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the Payin Link.
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Link.
+        description:
+          type: string
+          description: Description of the Payin Link.
+        targetMerchantAccountId:
+          type: string
+          description: Account ID of the target merchant for this Payin Link.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Link is created.
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        status:
+          type: string
+          description: The current status of the Payin Link.
+        paymentUrl:
+          type: string
+          description: URL to which the customer can go to complete the payment.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the payment process.
+        amount:
+          type: number
+          description: The total amount to be paid through the Payin Link.
+        amountCollected:
+          type: number
+          description: The amount that has been collected so far through the Payin Link.
+        fee:
+          type: number
+          description: Any fee associated with the Payin Link.
+        type:
+          type: string
+          description: The type of Payin Link (e.g., nequiButton, pse).
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string representing when the Payin Link was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string representing when the Payin Link was last updated.
+    PayinLinkBancolombiaButton:
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - amount
+        - type
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Link.
+        description:
+          type: string
+          description: An optional description of the Payin Link.
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant for this Payin Link.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Link is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the payment process.
+        expiration:
+          type: string
+          description: An optional expiration date and time for the Payin Link.
+        amount:
+          type: number
+          description: The amount to be paid through the Payin Link.
+        type:
+          type: string
+          description: The type of the Payin Link, which is 'bancolombiaButton' for this schema.
+          enum:
+            - bancolombiaButton
+    PayinLinkNequiButton:
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - amount
+        - type
+        - phoneNumber
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Link.
+        description:
+          type: string
+          description: An optional description of the Payin Link.
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant for this Payin Link.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Link is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the payment process.
+        expiration:
+          type: string
+          description: An optional expiration date and time for the Payin Link.
+        amount:
+          type: number
+          description: The amount to be paid through the Payin Link.
+        type:
+          type: string
+          description: The type of the Payin Link, which is 'nequiButton' for this schema.
+          enum:
+            - nequiButton
+        phoneNumber:
+          type: string
+          description: The phone number of the customer, required for Nequi payments.
+    PayinLinkCard:
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - amount
+        - type
+        - card
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Link.
+        description:
+          type: string
+          description: An optional description of the Payin Link.
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant for this Payin Link.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Link is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the payment process.
+        expiration:
+          type: string
+          description: An optional expiration date and time for the Payin Link.
+        amount:
+          type: number
+          description: The amount to be paid through the Payin Link.
+        type:
+          type: string
+          description: The type of the Payin Link, which is 'card' for this schema.
+          enum:
+            - card
+        card:
+          $ref: "#/components/schemas/Card"
