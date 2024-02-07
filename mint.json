@@ -45,58 +45,11 @@
           "group": "Endpoints",
           "pages": [
             {
-              "group": "Merchant Accounts",
-              "pages": [
-                "api-documentation/merchantAccounts/getListOfAllMerchants",
-                "api-documentation/merchantAccounts/getMerchantAccount"
-              ]
-            },
-            {
               "group": "Customers",
               "pages": [
                 "api-documentation/customers/createCustomer",
                 "api-documentation/customers/getAllCustomers",
                 "api-documentation/customers/getCustomer"
-              ]
-            },
-            {
-              "group": "Payment Links",
-              "pages": [
-                "api-documentation/paymentLinks/createPaymentLink",
-                "api-documentation/paymentLinks/getAllPaymentLinks",
-                "api-documentation/paymentLinks/getPaymentLink"
-              ]
-            },
-            {
-              "group": "Payment Methods",
-              "pages": [
-                "api-documentation/paymentMethods/createPaymentMethod",
-                "api-documentation/paymentMethods/getAllPaymentMethods",
-                "api-documentation/paymentMethods/getPaymentMethod"
-              ]
-            },
-            {
-              "group": "Payment Requests",
-              "pages": [
-                "api-documentation/paymentRequests/createPaymentRequest",
-                "api-documentation/paymentRequests/getAllPaymentRequests",
-                "api-documentation/paymentRequests/getPaymentRequest"
-              ]
-            },
-            {
-              "group": "Payout Targets",
-              "pages": [
-                "api-documentation/payoutTargets/createPayoutTarget",
-                "api-documentation/payoutTargets/getAllPayoutTargets",
-                "api-documentation/payoutTargets/getPayoutTarget"
-              ]
-            },
-            {
-              "group": "Payout Requests",
-              "pages": [
-                "api-documentation/payoutRequests/createPayoutRequest",
-                "api-documentation/payoutRequests/getAllPayoutRequests",
-                "api-documentation/payoutRequests/getPayoutRequest"
               ]
             }
           ]
