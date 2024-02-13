@@ -34,22 +34,62 @@
   ],
   "navigation": [
     {
-      "group": "General",
-      "pages": ["general/about"]
+      "group": "Introduction",
+      "pages": ["introduction/about"]
     },
     {
       "group": "API Documentation",
       "pages": [
-        "api-documentation/introduction",
+        "api-documentation/general",
+        {
+          "group": "Receiving Money",
+          "pages": [
+            "api-documentation/oneTimePayin",
+            "api-documentation/recurringPayins"
+          ]
+        },
+        "api-documentation/payouts",
         {
           "group": "Endpoints",
           "pages": [
             {
               "group": "Customers",
               "pages": [
-                "api-documentation/customers/createCustomer",
-                "api-documentation/customers/getAllCustomers",
-                "api-documentation/customers/getCustomer"
+                "api-documentation/customers/create",
+                "api-documentation/customers/list",
+                "api-documentation/customers/get"
+              ]
+            },
+            {
+              "group": "Payin Links",
+              "pages": [
+                "api-documentation/payinLinks/create",
+                "api-documentation/payinLinks/list",
+                "api-documentation/payinLinks/get"
+              ]
+            },
+            {
+              "group": "Payin Sources",
+              "pages": [
+                "api-documentation/payinSources/create",
+                "api-documentation/payinSources/list",
+                "api-documentation/payinSources/get"
+              ]
+            },
+            {
+              "group": "Payout Targets",
+              "pages": [
+                "api-documentation/payoutTargets/create",
+                "api-documentation/payoutTargets/list",
+                "api-documentation/payoutTargets/get"
+              ]
+            },
+            {
+              "group": "Payout Requests",
+              "pages": [
+                "api-documentation/payoutRequests/create",
+                "api-documentation/payoutRequests/list",
+                "api-documentation/payoutRequests/get"
               ]
             }
           ]
