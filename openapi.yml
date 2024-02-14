@@ -8,6 +8,8 @@ servers:
     description: Production server
   - url: https://sandbox.api.palomma.com/v0
     description: Sandbox server
+security:
+  - BearerAuth: []
 paths:
   /customers:
     post:
@@ -53,13 +55,13 @@ paths:
                   description: Customer’s phone number.
       responses:
         "201":
-          description: Customer created successfully
+          description: Customer created successfully.
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/Customer"
         "400":
-          description: Bad Request - Invalid input provided
+          description: Bad request.
           content:
             application/json:
               schema:
@@ -67,9 +69,8 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Description of the error due to bad request.
         "401":
-          description: Unauthorized - Authentication credentials were not provided or are invalid
+          description: Unauthorized.
           content:
             application/json:
               schema:
@@ -77,9 +78,8 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Description of the error due to unauthorized access.
         "500":
-          description: Internal Server Error - An error occurred on the server
+          description: Internal server error.
           content:
             application/json:
               schema:
@@ -87,7 +87,98 @@ paths:
                 properties:
                   message:
                     type: string
-                    description: Description of the internal server error.
+    get:
+      summary: Retrieve customers
+      description: Retrieves a list of customers.
+      operationId: listCustomers
+      tags:
+        - customers
+      responses:
+        "200":
+          description: List of customers successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Customer"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /customers/{customerId}:
+    get:
+      summary: Retrieve a Customer
+      description: Retrieves a Customer using the ID specified.
+      operationId: getCustomerById
+      tags:
+        - Customers
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: customerId
+          in: path
+          required: true
+          description: Unique identifier of the customer.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Customer retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Customer"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Customer not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
   /payinLinks:
     post:
       summary: Creates a new Payin Link
@@ -286,6 +377,7 @@ components:
           example: "123"
           pattern: '^\d{3,4}$' # Basic validation for 3 to 4 digit numbers
     PayinLinkPSE:
+      title: pse
       type: object
       required:
         - customerId
@@ -373,6 +465,7 @@ components:
           format: date-time
           description: ISO string representing when the Payin Link was last updated.
     PayinLinkBancolombiaButton:
+      title: bancolombia button
       type: object
       required:
         - customerId
@@ -407,6 +500,7 @@ components:
           enum:
             - bancolombiaButton
     PayinLinkNequiButton:
+      title: nequi button
       type: object
       required:
         - customerId
@@ -445,6 +539,7 @@ components:
           type: string
           description: The phone number of the customer, required for Nequi payments.
     PayinLinkCard:
+      title: card
       type: object
       required:
         - customerId
@@ -481,3 +576,8 @@ components:
             - card
         card:
           $ref: "#/components/schemas/Card"
+
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
