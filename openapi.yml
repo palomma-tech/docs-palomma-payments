@@ -620,6 +620,148 @@ paths:
                 properties:
                   message:
                     type: string
+  /payoutTargets:
+    post:
+      summary: Creates a new Payout Target
+      operationId: createPayoutTarget
+      tags:
+        - Payout Targets
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/PayoutTargetBankAccount"
+                - $ref: "#/components/schemas/PayoutTargetTransfiya"
+      responses:
+        "201":
+          description: Payout Target created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutTarget"
+        "400":
+          description: Bad Request - Invalid input provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to bad request.
+        "401":
+          description: Unauthorized - Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to unauthorized access.
+        "500":
+          description: Internal Server Error - An error occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the internal server error.
+    get:
+      summary: Retrieve payout targets
+      operationId: listPayoutTargets
+      tags:
+        - Payout Targets
+      responses:
+        "200":
+          description: List of payout targets successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayoutTarget"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payoutTargets/{payoutTargetId}:
+    get:
+      summary: Retrieve a Payout Target
+      operationId: getPayoutTargetById
+      tags:
+        - Payout Targets
+      parameters:
+        - name: payoutTargetId
+          in: path
+          required: true
+          description: Unique identifier of the payout target.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payout target retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutTarget"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payout Target not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
 components:
   schemas:
@@ -1177,6 +1319,114 @@ components:
         - amount
         - amountCollected
         - fee
+        - createdAt
+        - updatedAt
+    PayoutTargetBankAccount:
+      title: Bank Account
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - type
+        - bankAccount
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payout Target.
+        description:
+          type: string
+          description: An optional description of the Payout Target.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payout Target is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the authorization process.
+        type:
+          type: string
+          description: The type of the Payout Target, which is 'bankAccount' for this schema.
+          enum:
+            - bankAccount
+    PayoutTargetTransfiya:
+      title: Transfiya
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - type
+        - bankAccount
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payout Target.
+        description:
+          type: string
+          description: An optional description of the Payout Target.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payout Target is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the authorization process.
+        type:
+          type: string
+          description: The type of the Payout Target, which is 'transfiya' for this schema.
+          enum:
+            - transfiya
+        phoneNumber:
+          type: string
+          description: Customer’s phone number.
+    PayoutTarget:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this payout target.
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payout target.
+        description:
+          type: string
+          description: An extra metadata field that can be included for visibility.
+        customerId:
+          type: string
+          description: Reference to customer who owns this payout target.
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+          description: Details about the customer who owns this payout target.
+        status:
+          type: string
+          enum:
+            - pending
+            - active
+            - cancelled
+          description: Status of the payout target.
+        statusMessage:
+          type: string
+          description: Gives further detail on the status of the payout target. Only present when status is "cancelled".
+        authUrl:
+          type: string
+          description: URL where the customer should be redirected to complete the payout target verification.
+        redirectUrl:
+          type: string
+          description: URL where the customer will be redirected after completing the payout target verification.
+        type:
+          type: string
+          enum:
+            - bankAccount
+            - transfiya
+          description: Type of payout target created.
+        createdAt:
+          type: string
+          description: ISO string when the payout target was created.
+        updatedAt:
+          type: string
+          description: ISO string when the payout target was last updated.
+      required:
+        - id
+        - customerId
+        - status
+        - type
         - createdAt
         - updatedAt
 
