@@ -464,6 +464,162 @@ paths:
                 properties:
                   message:
                     type: string
+  /payinRequests:
+    post:
+      summary: Creates a new Payin Request
+      operationId: createPayinRequest
+      tags:
+        - Payin Requests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payinSourceId
+                - amount
+              properties:
+                reference:
+                  type: string
+                  description: Reference sent in by merchant to identify payin request.
+                targetMerchantAccountId:
+                  description: An optional account ID of the target merchant account for this Payin Request.
+                  type: string
+                payinSourceId:
+                  type: string
+                  description: Payin source to debit from.
+                amount:
+                  type: number
+                  description: Amount to be paid.
+      responses:
+        "201":
+          description: Payin Request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinRequest"
+        "400":
+          description: Bad Request - Invalid input provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to bad request.
+        "401":
+          description: Unauthorized - Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to unauthorized access.
+        "500":
+          description: Internal Server Error - An error occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the internal server error.
+    get:
+      summary: Retrieve payin requests
+      operationId: listPayinRequests
+      tags:
+        - Payin Requests
+      responses:
+        "200":
+          description: List of payin requests successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayinRequest"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payinRequests/{payinRequestId}:
+    get:
+      summary: Retrieve a Payin Request
+      operationId: getPayinRequestById
+      tags:
+        - Payin Requests
+      parameters:
+        - name: payinRequestId
+          in: path
+          required: true
+          description: Unique identifier of the payin request.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payin Request retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payin Request not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
 components:
   schemas:
@@ -923,7 +1079,7 @@ components:
         type:
           type: string
           description: Type of payment method created.
-          enum: [bankAccount, bancolombiaToken, nequiToken, daviplataToken]
+          enum: [bankAccount, bancolombiaToken, nequiToken]
         createdAt:
           type: string
           format: date-time
@@ -932,6 +1088,22 @@ components:
           type: string
           format: date-time
           description: ISO string when the payin source was last updated.
+    PayinSourceDetails:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payin source.
+        description:
+          type: string
+          description: An extra metadata field that can be included for visibility.
+        partialPayinsEnabled:
+          type: boolean
+          description: Indicates whether partial payins are enabled.
+        type:
+          type: string
+          description: Type of payment method created.
+          enum: [bankAccount, bancolombiaToken, nequiToken]
     BankAccount:
       type: object
       properties:
@@ -946,6 +1118,68 @@ components:
         accountNumber:
           type: string
           description: The bank account number.
+    PayinRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this payin request.
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payin request.
+        targetMerchantAccountId:
+          type: string
+          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
+        customerId:
+          type: string
+          description: Reference to customer who owns the payin source from which the payin request was created.
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+          description: Details about the customer who owns the payin source from which the payin request was created.
+        payinSourceId:
+          type: string
+          description: Reference to payin source from which the payin request was created.
+        payinSourceDetails:
+          $ref: "#/components/schemas/PayinSourceDetails"
+          description: Details about the payin source from which the payin request was created.
+        status:
+          type: string
+          enum:
+            - processing
+            - approved
+            - partial
+            - cancelled
+          description: Status of the payin request.
+        statusMessage:
+          type: string
+          description: Gives further detail on the status of the payin request. Only present when status is "cancelled".
+        amount:
+          type: number
+          description: Amount to collect from the customer’s payment method. Must be an integer.
+        amountCollected:
+          type: number
+          description: Amount collected by payin request. Starts at 0 and changes on status change to "approved" or "partial".
+        fee:
+          type: number
+          description: Fee charged for the transaction. This fee will be subtracted from amountCollected at settlement time.
+        createdAt:
+          type: string
+          description: ISO string when the payin request was created.
+        updatedAt:
+          type: string
+          description: ISO string when the payin request was last updated.
+      required:
+        - id
+        - targetMerchantAccountId
+        - customerId
+        - payinSourceId
+        - status
+        - amount
+        - amountCollected
+        - fee
+        - createdAt
+        - updatedAt
+
   securitySchemes:
     BearerAuth:
       type: http
