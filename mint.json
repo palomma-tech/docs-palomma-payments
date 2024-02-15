@@ -77,6 +77,14 @@
               ]
             },
             {
+              "group": "Payin Requests",
+              "pages": [
+                "api-documentation/payinRequests/create",
+                "api-documentation/payinRequests/list",
+                "api-documentation/payinRequests/get"
+              ]
+            },
+            {
               "group": "Payout Targets",
               "pages": [
                 "api-documentation/payoutTargets/create",

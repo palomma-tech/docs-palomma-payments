@@ -321,6 +321,150 @@ paths:
                 properties:
                   message:
                     type: string
+  /payinSources:
+    post:
+      summary: Creates a new Payin Source
+      operationId: createPayinSource
+      tags:
+        - Payin Sources
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              oneOf:
+                - $ref: "#/components/schemas/PayinSourceBankAccount"
+                - $ref: "#/components/schemas/PayinSourceBancolombiaToken"
+                - $ref: "#/components/schemas/PayinSourceNequiToken"
+      responses:
+        "201":
+          description: Payin Source created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinSource"
+        "400":
+          description: Bad Request - Invalid input provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to bad request.
+        "401":
+          description: Unauthorized - Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to unauthorized access.
+        "500":
+          description: Internal Server Error - An error occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the internal server error.
+    get:
+      summary: Retrieve payin source
+      operationId: listPayinSources
+      tags:
+        - Payin Sources
+      responses:
+        "200":
+          description: List of payin sources successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayinSource"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payinSources/{payinSourceId}:
+    get:
+      summary: Retrieve a Payin Source
+      operationId: getPayinSourceById
+      tags:
+        - Payin Sources
+      parameters:
+        - name: payinSourceId
+          in: path
+          required: true
+          description: Unique identifier of the payin source.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payin Source retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinSource"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payin Source not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+
 components:
   schemas:
     Customer:
@@ -652,7 +796,156 @@ components:
             - card
         card:
           $ref: "#/components/schemas/Card"
+    PayinSourceBancolombiaToken:
+      title: Bancolombia Token
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - type
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Source.
+        description:
+          type: string
+          description: An optional description of the Payin Source.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Source is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the authorization process.
+        type:
+          type: string
+          description: The type of the Payin Source, which is 'bancolombiaToken' for this schema.
+          enum:
+            - bancolombiaToken
+    PayinSourceNequiToken:
+      title: Nequi Token
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - type
+        - phoneNumber
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Source.
+        description:
+          type: string
+          description: An optional description of the Payin Source.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Source is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the authorization process.
+        type:
+          type: string
+          description: The type of the Payin Source, which is 'nequiToken' for this schema.
+          enum:
+            - nequiToken
+        phoneNumber:
+          type: string
+          description: Customer’s phone number.
+    PayinSourceBankAccount:
+      title: Bank Account
+      type: object
+      required:
+        - customerId
+        - redirectUrl
+        - type
+        - bankAccount
+      properties:
+        reference:
+          type: string
+          description: An optional reference provided by the merchant to identify the Payin Source.
+        description:
+          type: string
+          description: An optional description of the Payin Source.
+        customerId:
+          type: string
+          description: The ID of the customer for whom the Payin Source is created.
+        redirectUrl:
+          type: string
+          description: URL to which the customer will be redirected after the authorization process.
+        type:
+          type: string
+          description: The type of the Payin Source, which is 'bankAccount' for this schema.
+          enum:
+            - bankAccount
+        phoneNumber:
+          type: string
+          description: Customer’s phone number.
 
+        partialPayinsEnabled:
+          type: boolean
+          description: Only available for bancolombia. Partial debit will be made if the account does not have total amount.
+        authRequired:
+          type: boolean
+          description: Determines whether the bank account must be verified before debits are made.
+    PayinSource:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for this payin source.
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payin source.
+        description:
+          type: string
+          description: An extra metadata field that can be included for visibility.
+        customerId:
+          type: string
+          description: Reference to customer who owns this payin source.
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+        status:
+          type: string
+          description: Status of the payin source.
+          enum: [pending, processing, active, cancelled]
+        statusMessage:
+          type: string
+          description: Further detail on the status of the payin source.
+        authUrl:
+          type: string
+          description: URL where the customer should be redirected to complete the account authentication and debit authorization, on pending and processing status.
+        redirectUrl:
+          type: string
+          description: URL where the customer will be redirected after completing account authentication and authorizing debits.
+        partialPayinsEnabled:
+          type: boolean
+          description: Indicates whether partial payins are enabled.
+        type:
+          type: string
+          description: Type of payment method created.
+          enum: [bankAccount, bancolombiaToken, nequiToken, daviplataToken]
+        createdAt:
+          type: string
+          format: date-time
+          description: ISO string when the payin source was created.
+        updatedAt:
+          type: string
+          format: date-time
+          description: ISO string when the payin source was last updated.
+    BankAccount:
+      type: object
+      properties:
+        bank:
+          $ref: "#/components/schemas/Bank"
+        accountType:
+          type: string
+          description: The type of the bank account.
+          enum:
+            - savings
+            - checking
+        accountNumber:
+          type: string
+          description: The bank account number.
   securitySchemes:
     BearerAuth:
       type: http
