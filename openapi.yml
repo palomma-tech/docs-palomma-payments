@@ -14,7 +14,6 @@ paths:
   /customers:
     post:
       summary: Creates a new customer
-      description: Creates a new Customer from the information sent in the body.
       operationId: createCustomer
       tags:
         - customers
@@ -89,7 +88,6 @@ paths:
                     type: string
     get:
       summary: Retrieve customers
-      description: Retrieves a list of customers.
       operationId: listCustomers
       tags:
         - customers
@@ -99,9 +97,12 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Customer"
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Customer"
         "401":
           description: Unauthorized.
           content:
@@ -123,12 +124,9 @@ paths:
   /customers/{customerId}:
     get:
       summary: Retrieve a Customer
-      description: Retrieves a Customer using the ID specified.
       operationId: getCustomerById
       tags:
         - Customers
-      security:
-        - bearerAuth: []
       parameters:
         - name: customerId
           in: path
@@ -182,7 +180,6 @@ paths:
   /payinLinks:
     post:
       summary: Creates a new Payin Link
-      description: Creates a new Payin Link from the information sent in the body.
       operationId: createPayinLink
       tags:
         - Payin Links
@@ -233,6 +230,97 @@ paths:
                   message:
                     type: string
                     description: Description of the internal server error.
+    get:
+      summary: Retrieve payin link
+      operationId: listPayinLinks
+      tags:
+        - Payin Links
+      responses:
+        "200":
+          description: List of payin links successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayinLink"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payinLinks/{payinLinkId}:
+    get:
+      summary: Retrieve a Payin Link
+      operationId: getPayinLinkById
+      tags:
+        - Payin Links
+      parameters:
+        - name: payinLinkId
+          in: path
+          required: true
+          description: Unique identifier of the payin link.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payin Link retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayinLink"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payin Link not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 components:
   schemas:
     Customer:
@@ -377,7 +465,7 @@ components:
           example: "123"
           pattern: '^\d{3,4}$' # Basic validation for 3 to 4 digit numbers
     PayinLinkPSE:
-      title: pse
+      title: PSE
       type: object
       required:
         - customerId
@@ -394,16 +482,13 @@ components:
           description: An optional description of the Payin Link.
         targetMerchantAccountId:
           type: string
-          description: An optional account ID of the target merchant for this Payin Link.
+          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
         redirectUrl:
           type: string
           description: URL to which the customer will be redirected after the payment process.
-        expiration:
-          type: string
-          description: An optional expiration date and time for the Payin Link.
         amount:
           type: number
           description: The amount to be paid through the Payin Link.
@@ -429,7 +514,7 @@ components:
           description: Description of the Payin Link.
         targetMerchantAccountId:
           type: string
-          description: Account ID of the target merchant for this Payin Link.
+          description: Account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
@@ -465,7 +550,7 @@ components:
           format: date-time
           description: ISO string representing when the Payin Link was last updated.
     PayinLinkBancolombiaButton:
-      title: bancolombia button
+      title: Bancolombia Button
       type: object
       required:
         - customerId
@@ -481,16 +566,13 @@ components:
           description: An optional description of the Payin Link.
         targetMerchantAccountId:
           type: string
-          description: An optional account ID of the target merchant for this Payin Link.
+          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
         redirectUrl:
           type: string
           description: URL to which the customer will be redirected after the payment process.
-        expiration:
-          type: string
-          description: An optional expiration date and time for the Payin Link.
         amount:
           type: number
           description: The amount to be paid through the Payin Link.
@@ -500,7 +582,7 @@ components:
           enum:
             - bancolombiaButton
     PayinLinkNequiButton:
-      title: nequi button
+      title: Nequi Button
       type: object
       required:
         - customerId
@@ -517,16 +599,13 @@ components:
           description: An optional description of the Payin Link.
         targetMerchantAccountId:
           type: string
-          description: An optional account ID of the target merchant for this Payin Link.
+          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
         redirectUrl:
           type: string
           description: URL to which the customer will be redirected after the payment process.
-        expiration:
-          type: string
-          description: An optional expiration date and time for the Payin Link.
         amount:
           type: number
           description: The amount to be paid through the Payin Link.
@@ -539,7 +618,7 @@ components:
           type: string
           description: The phone number of the customer, required for Nequi payments.
     PayinLinkCard:
-      title: card
+      title: Card
       type: object
       required:
         - customerId
@@ -556,16 +635,13 @@ components:
           description: An optional description of the Payin Link.
         targetMerchantAccountId:
           type: string
-          description: An optional account ID of the target merchant for this Payin Link.
+          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
         redirectUrl:
           type: string
           description: URL to which the customer will be redirected after the payment process.
-        expiration:
-          type: string
-          description: An optional expiration date and time for the Payin Link.
         amount:
           type: number
           description: The amount to be paid through the Payin Link.
