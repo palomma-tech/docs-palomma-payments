@@ -762,6 +762,162 @@ paths:
                 properties:
                   message:
                     type: string
+  /payoutRequests:
+    post:
+      summary: Creates a new Payout Request
+      operationId: createPayoutRequest
+      tags:
+        - Payout Requests
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - payoutTargetId
+                - amount
+              properties:
+                reference:
+                  type: string
+                  description: Reference sent in by merchant to identify payout request.
+                sourceMerchantAccountId:
+                  description: An optional account ID of the source merchant account for this Payout Request.
+                  type: string
+                payoutTargetId:
+                  type: string
+                  description: Payout target to send money to.
+                amount:
+                  type: number
+                  description: Amount to be sent.
+      responses:
+        "201":
+          description: Payout Request created successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutRequest"
+        "400":
+          description: Bad Request - Invalid input provided
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to bad request.
+        "401":
+          description: Unauthorized - Authentication credentials were not provided or are invalid
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the error due to unauthorized access.
+        "500":
+          description: Internal Server Error - An error occurred on the server
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    description: Description of the internal server error.
+    get:
+      summary: Retrieve payout requests
+      operationId: listPayoutRequests
+      tags:
+        - Payout Requests
+      responses:
+        "200":
+          description: List of payout requests successfully retrieved.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  items:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/PayoutRequest"
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+  /payoutRequests/{payoutRequestId}:
+    get:
+      summary: Retrieve a Payout Request
+      operationId: getPayoutRequestById
+      tags:
+        - Payout Requests
+      parameters:
+        - name: payoutRequestId
+          in: path
+          required: true
+          description: Unique identifier of the payout request.
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Payout Request retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PayoutRequest"
+        "400":
+          description: Bad request.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "401":
+          description: Unauthorized.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "404":
+          description: Payout Request not found.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+        "500":
+          description: Internal server error.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
 
 components:
   schemas:
@@ -1427,6 +1583,79 @@ components:
         - customerId
         - status
         - type
+        - createdAt
+        - updatedAt
+    PayoutTargetDetails:
+      type: object
+      properties:
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payout target.
+        description:
+          type: string
+          description: An extra metadata field that can be included for visibility.
+        type:
+          type: string
+          description: Type of payout source created.
+          enum: [bankAccount, transfiya]
+    PayoutRequest:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for this payout request.
+        reference:
+          type: string
+          description: Reference sent in by merchant to identify payout request.
+        sourceMerchantAccountId:
+          type: string
+          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
+        customerId:
+          type: string
+          description: Reference to customer who owns the payout target for which the payout request was created.
+        customerDetails:
+          $ref: "#/components/schemas/CustomerDetails"
+          description: Details about the customer who owns the payout target for which the payout request was created.
+        payoutTargetId:
+          type: string
+          description: Reference to the payout target for which the payout request was created.
+        payoutTargetDetails:
+          $ref: "#/components/schemas/PayoutTargetDetails"
+          description: Details about the payout target for which the payout request was created.
+        status:
+          type: string
+          enum:
+            - processing
+            - approved
+            - cancelled
+          description: Status of the payout request.
+        statusMessage:
+          type: string
+          description: Gives further detail on the status of the payout request. Only present when status is "cancelled".
+        amount:
+          type: number
+          description: Amount to collect from the customer’s payment method. Must be an integer.
+        amountSent:
+          type: number
+          description: Amount sent by payout request. Starts at amount and changes to 0 if cancelled.
+        fee:
+          type: number
+          description: Fee charged for the transaction. This fee will be subtracted from amountCollected at settlement time.
+        createdAt:
+          type: string
+          description: ISO string when the payout request was created.
+        updatedAt:
+          type: string
+          description: ISO string when the payout request was last updated.
+      required:
+        - id
+        - sourceMerchantAccountId
+        - customerId
+        - payoutTargetId
+        - status
+        - amount
+        - amountSent
+        - fee
         - createdAt
         - updatedAt
 
