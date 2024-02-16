@@ -4,31 +4,21 @@ title: Sending Money
 
 1. **Create a [Customer](/api-documentation/customers/create)**
 
-<Tip>
-  Store the `id` of the `Customer` object. You will need it to create the
-  `Payout Target`.
-</Tip>
-
 2. **Create a [Payout Target](/api-documentation/payoutTargets/create)**
-
-<Tip>
-  Store the `id` of the `Payout Target` object. You will need it to create the
-  `Payout Request`.
-</Tip>
 
 3. **Redirect the customer**
 
-The `Payout Target` has an attribute `authUrl`. The customer will needs to verify the `Payout Target` before it can be used. When the customer completes the auth flow, Palomma will redirect the user back to the `redirectUrl` you provided when creating the `Payout Target`.
+The `Payout Target` has an attribute `authUrl`. The customer must verify the `Payout Target` before it can be used. When the customer completes the auth flow, Palomma will redirect the user back to the `redirectUrl` you provided when creating the `Payout Target`.
 
 4. **Wait for webhook notification**
 
-Palomma will send a webhook event confirming when the `Payout Target` changes `status`. If the `status` is `active`, you can create a `Payout Request`.
+Palomma will send a webhook event confirming when the `Payout Target` is active.
 
 5. **Create a [Payout Request](/api-documentation/payoutRequests/create)**
 
 <Tip>
-  You only need to follow steps 1-4 once. If you have a `Payout Target` that is
-  `active`, you can go straight to this step.
+  You only need steps 1-4 for the first payout. Future payouts can use the same
+  `Payout Source`.
 </Tip>
 
 6. **Wait for webhook notification**

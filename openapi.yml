@@ -482,16 +482,16 @@ paths:
               properties:
                 reference:
                   type: string
-                  description: Reference sent in by merchant to identify payin request.
+                  description: Reference sent in by merchant to identify Payin Request.
+                payinSourceId:
+                  type: string
+                  description: ID indicating which Payment Source to debit from.
+                amount:
+                  type: number
+                  description: Amount to be paid in COP.
                 targetMerchantAccountId:
                   description: An optional account ID of the target merchant account for this Payin Request.
                   type: string
-                payinSourceId:
-                  type: string
-                  description: Payin source to debit from.
-                amount:
-                  type: number
-                  description: Amount to be paid.
       responses:
         "201":
           description: Payin Request created successfully
@@ -780,16 +780,16 @@ paths:
               properties:
                 reference:
                   type: string
-                  description: Reference sent in by merchant to identify payout request.
+                  description: Reference sent in by merchant to identify Payout Request.
                 sourceMerchantAccountId:
                   description: An optional account ID of the source merchant account for this Payout Request.
                   type: string
                 payoutTargetId:
                   type: string
-                  description: Payout target to send money to.
+                  description: Payout Target to send money to.
                 amount:
                   type: number
-                  description: Amount to be sent.
+                  description: Amount to be sent in COP.
       responses:
         "201":
           description: Payout Request created successfully
@@ -926,14 +926,15 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: Unique identifier for this customer.
+          example: 01HPR57X6QR5ZRKEEKBSDBW4RA
         reference:
           type: string
           description: Reference sent in by merchant to identify customer.
         name:
           type: string
           description: First and last name for a natural person, and company name for a juridical person.
+          example: Pepito Perez
         documentType:
           type: string
           description: Colombian ID type for customer.
@@ -944,23 +945,26 @@ components:
         documentNumber:
           type: string
           description: Colombian ID number for customer.
+          example: "1037551022"
         email:
           type: string
           description: Customer’s email.
+          example: pepito@gmail.com
         phoneNumber:
           type: string
           description: Customer’s phone number.
+          example: "3013111111"
         createdAt:
           type: string
           format: date-time
-          description: ISO string when the customer was created.
+          description: ISO string indicating when the customer was created.
         updatedAt:
           type: string
           format: date-time
-          description: ISO string when the customer was updated.
+          description: ISO string indicating when the customer was updated.
     Bank:
       type: string
-      description: The list of banks supported by the Palomma API. This defines the acceptable bank names that can be used when creating a Payin Link.
+      description: The list of banks supported by the Palomma API.
       enum:
         - alianza
         - ban100
@@ -1006,34 +1010,30 @@ components:
         reference:
           type: string
           description: An optional reference provided by the merchant to identify the customer.
-          example: "LDFLKFL"
         name:
           type: string
-          description: The customer's full name.
-          example: "Andres Uribe"
+          description: First and last name for a natural person, and company name for a juridical person.
+          example: "Pepito Perez"
         documentType:
           type: string
-          description: The type of identification document provided by the customer (e.g., cc for cédula de ciudadanía).
+          description: Colombian ID type for customer.
           enum:
             - cc
             - ce
             - nit
-            - passport
-            - other
-          example: "cc"
         documentNumber:
           type: string
-          description: The identification document number of the customer.
-          example: "1037661022"
+          description: Colombian ID number for customer.
+          example: "1037551022"
         email:
           type: string
-          description: The email address of the customer.
+          description: Customer’s email.
           format: email
-          example: "felipe@palomma.com"
+          example: "pepito@gmail.com"
         phoneNumber:
           type: string
-          description: The phone number of the customer, must be a valid Colombian number.
-          example: "3218009757"
+          description: Customer’s phone number.
+          example: "3013111111"
     Card:
       type: object
       required:
@@ -1078,9 +1078,6 @@ components:
         description:
           type: string
           description: An optional description of the Payin Link.
-        targetMerchantAccountId:
-          type: string
-          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
@@ -1089,56 +1086,76 @@ components:
           description: URL to which the customer will be redirected after the payment process.
         amount:
           type: number
-          description: The amount to be paid through the Payin Link.
+          description: The amount to be paid in COP.
         type:
           type: string
-          description: The type of the Payin Link, which is 'pse' for this schema.
           enum:
             - pse
         bank:
           $ref: "#/components/schemas/Bank"
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant account for this Payin Link.
     PayinLink:
       type: object
       properties:
         id:
           type: string
-          format: uuid
           description: Unique identifier for the Payin Link.
+          example: 01HPR5TEDFKT498V8CYY3RPCXP
         reference:
           type: string
           description: An optional reference provided by the merchant to identify the Payin Link.
         description:
           type: string
           description: Description of the Payin Link.
-        targetMerchantAccountId:
-          type: string
-          description: Account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
+          example: 01HPR57X6QR5ZRKEEKBSDBW4RA
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
         status:
           type: string
+          enum:
+            - pending
+            - processing
+            - approved
+            - cancelled
+          example: approved
           description: The current status of the Payin Link.
         paymentUrl:
           type: string
           description: URL to which the customer can go to complete the payment.
+          example: http://payments.palomma.com/payinLinks?payinLinkId=01HPR5TEDFKT498V8CYY3RPCXP
         redirectUrl:
           type: string
           description: URL to which the customer will be redirected after the payment process.
+          example: http://merchant.com/checkout
         amount:
           type: number
-          description: The total amount to be paid through the Payin Link.
+          description: The total amount to be paid in COP.
+          example: 100000
         amountCollected:
           type: number
-          description: The amount that has been collected so far through the Payin Link.
+          description: The amount that has been collected in COP.
+          example: 100000
         fee:
           type: number
           description: Any fee associated with the Payin Link.
+          example: 500
         type:
           type: string
-          description: The type of Payin Link (e.g., nequiButton, pse).
+          description: The type of Payin Link
+          enum:
+            - pse
+            - bancolombiaButton
+            - nequiButton
+            - card
+        targetMerchantAccountId:
+          type: string
+          description: Account ID of the target merchant account for this Payin Link.
+          example: default
         createdAt:
           type: string
           format: date-time
@@ -1162,9 +1179,6 @@ components:
         description:
           type: string
           description: An optional description of the Payin Link.
-        targetMerchantAccountId:
-          type: string
-          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
@@ -1173,12 +1187,14 @@ components:
           description: URL to which the customer will be redirected after the payment process.
         amount:
           type: number
-          description: The amount to be paid through the Payin Link.
+          description: The amount to be paid in COP.
         type:
           type: string
-          description: The type of the Payin Link, which is 'bancolombiaButton' for this schema.
           enum:
             - bancolombiaButton
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant account for this Payin Link.
     PayinLinkNequiButton:
       title: Nequi Button
       type: object
@@ -1195,9 +1211,6 @@ components:
         description:
           type: string
           description: An optional description of the Payin Link.
-        targetMerchantAccountId:
-          type: string
-          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
@@ -1206,15 +1219,17 @@ components:
           description: URL to which the customer will be redirected after the payment process.
         amount:
           type: number
-          description: The amount to be paid through the Payin Link.
+          description: The amount to be paid in COP.
         type:
           type: string
-          description: The type of the Payin Link, which is 'nequiButton' for this schema.
           enum:
             - nequiButton
         phoneNumber:
           type: string
           description: The phone number of the customer, required for Nequi payments.
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant account for this Payin Link.
     PayinLinkCard:
       title: Card
       type: object
@@ -1231,9 +1246,6 @@ components:
         description:
           type: string
           description: An optional description of the Payin Link.
-        targetMerchantAccountId:
-          type: string
-          description: An optional account ID of the target merchant account for this Payin Link.
         customerId:
           type: string
           description: The ID of the customer for whom the Payin Link is created.
@@ -1242,14 +1254,16 @@ components:
           description: URL to which the customer will be redirected after the payment process.
         amount:
           type: number
-          description: The amount to be paid through the Payin Link.
+          description: The amount to be paid in COP.
         type:
           type: string
-          description: The type of the Payin Link, which is 'card' for this schema.
           enum:
             - card
         card:
           $ref: "#/components/schemas/Card"
+        targetMerchantAccountId:
+          type: string
+          description: An optional account ID of the target merchant account for this Payin Link.
     PayinSourceBancolombiaToken:
       title: Bancolombia Token
       type: object
@@ -1272,7 +1286,6 @@ components:
           description: URL to which the customer will be redirected after the authorization process.
         type:
           type: string
-          description: The type of the Payin Source, which is 'bancolombiaToken' for this schema.
           enum:
             - bancolombiaToken
     PayinSourceNequiToken:
@@ -1298,7 +1311,6 @@ components:
           description: URL to which the customer will be redirected after the authorization process.
         type:
           type: string
-          description: The type of the Payin Source, which is 'nequiToken' for this schema.
           enum:
             - nequiToken
         phoneNumber:
@@ -1327,16 +1339,14 @@ components:
           description: URL to which the customer will be redirected after the authorization process.
         type:
           type: string
-          description: The type of the Payin Source, which is 'bankAccount' for this schema.
           enum:
             - bankAccount
         phoneNumber:
           type: string
           description: Customer’s phone number.
-
         partialPayinsEnabled:
           type: boolean
-          description: Only available for bancolombia. Partial debit will be made if the account does not have total amount.
+          description: Only available for bancolombia. Partial debit will be made if the account does not sufficient funds to debit the total amount.
         authRequired:
           type: boolean
           description: Determines whether the bank account must be verified before debits are made.
@@ -1345,53 +1355,53 @@ components:
       properties:
         id:
           type: string
-          format: uuid
-          description: Unique identifier for this payin source.
+          description: Unique identifier for this Payin Source.
+          example: 01HPR7A40E44S0WDR189YXA8GH
         reference:
           type: string
-          description: Reference sent in by merchant to identify payin source.
+          description: Reference sent in by merchant to identify Payin Source.
         description:
           type: string
           description: An extra metadata field that can be included for visibility.
         customerId:
           type: string
-          description: Reference to customer who owns this payin source.
+          description: Reference to customer who owns this Payin Source.
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
         status:
           type: string
-          description: Status of the payin source.
+          description: Status of the Payin Source.
           enum: [pending, processing, active, cancelled]
         statusMessage:
           type: string
-          description: Further detail on the status of the payin source.
+          description: Further detail on the status of the Payin Source.
         authUrl:
           type: string
-          description: URL where the customer should be redirected to complete the account authentication and debit authorization, on pending and processing status.
+          description: URL where the customer should be redirected to complete the account authentication and debit authorization.
         redirectUrl:
           type: string
-          description: URL where the customer will be redirected after completing account authentication and authorizing debits.
+          description: URL where the customer will be redirected after auth flow.
         partialPayinsEnabled:
           type: boolean
           description: Indicates whether partial payins are enabled.
         type:
           type: string
-          description: Type of payment method created.
+          description: Type of Payin Source created.
           enum: [bankAccount, bancolombiaToken, nequiToken]
         createdAt:
           type: string
           format: date-time
-          description: ISO string when the payin source was created.
+          description: ISO string indicating when the Payin Source was created.
         updatedAt:
           type: string
           format: date-time
-          description: ISO string when the payin source was last updated.
+          description: ISO string indicating when the Payin Source was last updated.
     PayinSourceDetails:
       type: object
       properties:
         reference:
           type: string
-          description: Reference sent in by merchant to identify payin source.
+          description: Reference sent in by merchant to identify Payin Source.
         description:
           type: string
           description: An extra metadata field that can be included for visibility.
@@ -1400,7 +1410,7 @@ components:
           description: Indicates whether partial payins are enabled.
         type:
           type: string
-          description: Type of payment method created.
+          description: Type of Payin Source created.
           enum: [bankAccount, bancolombiaToken, nequiToken]
     BankAccount:
       type: object
@@ -1421,25 +1431,25 @@ components:
       properties:
         id:
           type: string
-          description: Unique identifier for this payin request.
+          description: Unique identifier for this Payin Request.
+          example: 01HPR83V7JBNJTKT303NTY3YGA
         reference:
           type: string
-          description: Reference sent in by merchant to identify payin request.
-        targetMerchantAccountId:
-          type: string
-          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
+          description: Reference sent in by merchant to identify Payin Request.
         customerId:
           type: string
-          description: Reference to customer who owns the payin source from which the payin request was created.
+          description: Reference to customer who owns the Payin Source from which the Payin Request was created.
+          example: 01HPR57X6QR5ZRKEEKBSDBW4RA
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
-          description: Details about the customer who owns the payin source from which the payin request was created.
+          description: Details about the customer who owns the Payin Source from which the Payin Request was created.
         payinSourceId:
           type: string
-          description: Reference to payin source from which the payin request was created.
+          description: Reference to Payin Source from which the Payin Request was created.
+          example: 01HPR7A40E44S0WDR189YXA8GH
         payinSourceDetails:
           $ref: "#/components/schemas/PayinSourceDetails"
-          description: Details about the payin source from which the payin request was created.
+          description: Details about the Payin Source from which the Payin Request was created.
         status:
           type: string
           enum:
@@ -1447,25 +1457,34 @@ components:
             - approved
             - partial
             - cancelled
-          description: Status of the payin request.
+          description: Status of the Payin Request.
+          example: approved
         statusMessage:
           type: string
-          description: Gives further detail on the status of the payin request. Only present when status is "cancelled".
+          description: Gives further detail on the status of the Payin Request. Only present when status is "cancelled".
         amount:
           type: number
-          description: Amount to collect from the customer’s payment method. Must be an integer.
+          description: Amount to collect from the customer’s Payin Source. Must be an integer.
+          example: 100000
         amountCollected:
           type: number
-          description: Amount collected by payin request. Starts at 0 and changes on status change to "approved" or "partial".
+          description: Amount collected by Payin Request. Starts at 0 and changes on status change to "approved" or "partial".
+          example: 100000
         fee:
           type: number
           description: Fee charged for the transaction. This fee will be subtracted from amountCollected at settlement time.
+          example: 500
+        targetMerchantAccountId:
+          type: string
+          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
         createdAt:
           type: string
-          description: ISO string when the payin request was created.
+          format: date-time
+          description: ISO string indicating when the payin request was created.
         updatedAt:
           type: string
-          description: ISO string when the payin request was last updated.
+          format: date-time
+          description: ISO string indicating when the payin request was last updated.
       required:
         - id
         - targetMerchantAccountId
@@ -1500,7 +1519,6 @@ components:
           description: URL to which the customer will be redirected after the authorization process.
         type:
           type: string
-          description: The type of the Payout Target, which is 'bankAccount' for this schema.
           enum:
             - bankAccount
     PayoutTargetTransfiya:
@@ -1526,7 +1544,6 @@ components:
           description: URL to which the customer will be redirected after the authorization process.
         type:
           type: string
-          description: The type of the Payout Target, which is 'transfiya' for this schema.
           enum:
             - transfiya
         phoneNumber:
@@ -1537,47 +1554,52 @@ components:
       properties:
         id:
           type: string
-          description: Unique identifier for this payout target.
+          description: Unique identifier for this Payout Target.
+          example: 01HPR8S7YF43PV3QV16TZDC80P
         reference:
           type: string
-          description: Reference sent in by merchant to identify payout target.
+          description: Reference sent in by merchant to identify Payout Target.
         description:
           type: string
           description: An extra metadata field that can be included for visibility.
         customerId:
           type: string
-          description: Reference to customer who owns this payout target.
+          description: Reference to customer who owns this Payout Target.
+          example: 01HPR57X6QR5ZRKEEKBSDBW4RA
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
-          description: Details about the customer who owns this payout target.
+          description: Details about the customer who owns this Payout Target.
         status:
           type: string
           enum:
             - pending
             - active
             - cancelled
-          description: Status of the payout target.
+          description: Status of the Payout Target.
+          example: active
         statusMessage:
           type: string
-          description: Gives further detail on the status of the payout target. Only present when status is "cancelled".
+          description: Gives further detail on the status of the Payout Target. Only present when status is "cancelled".
         authUrl:
           type: string
-          description: URL where the customer should be redirected to complete the payout target verification.
+          description: URL where the customer should be redirected to complete the Payout Target verification.
         redirectUrl:
           type: string
-          description: URL where the customer will be redirected after completing the payout target verification.
+          description: URL where the customer will be redirected after completing the Payout Target verification.
         type:
           type: string
           enum:
             - bankAccount
             - transfiya
-          description: Type of payout target created.
+          description: Type of Payout Target created.
         createdAt:
           type: string
-          description: ISO string when the payout target was created.
+          format: date-time
+          description: ISO string indicating when the Payout Target was created.
         updatedAt:
           type: string
-          description: ISO string when the payout target was last updated.
+          format: date-time
+          description: ISO string indicating when the Payout Target was last updated.
       required:
         - id
         - customerId
@@ -1590,63 +1612,71 @@ components:
       properties:
         reference:
           type: string
-          description: Reference sent in by merchant to identify payout target.
+          description: Reference sent in by merchant to identify Payout Target.
         description:
           type: string
           description: An extra metadata field that can be included for visibility.
         type:
           type: string
-          description: Type of payout source created.
+          description: Type of Payout Target created.
           enum: [bankAccount, transfiya]
     PayoutRequest:
       type: object
       properties:
         id:
           type: string
-          description: Unique identifier for this payout request.
+          description: Unique identifier for this Payout Request.
+          example: 01HPR8QBF5QKA313RPBSKYB7DS
         reference:
           type: string
-          description: Reference sent in by merchant to identify payout request.
-        sourceMerchantAccountId:
-          type: string
-          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
+          description: Reference sent in by merchant to identify Payout Request.
         customerId:
           type: string
-          description: Reference to customer who owns the payout target for which the payout request was created.
+          description: Reference to customer who owns the Payout Target for which the Payout Request was created.
+          example: 01HPR57X6QR5ZRKEEKBSDBW4RA
         customerDetails:
           $ref: "#/components/schemas/CustomerDetails"
-          description: Details about the customer who owns the payout target for which the payout request was created.
+          description: Details about the customer who owns the Payout Target for which the Payout Request was created.
         payoutTargetId:
           type: string
-          description: Reference to the payout target for which the payout request was created.
+          description: Reference to the Payout Target for which the Payout Request was created.
+          example: 01HPR8S7YF43PV3QV16TZDC80P
         payoutTargetDetails:
           $ref: "#/components/schemas/PayoutTargetDetails"
-          description: Details about the payout target for which the payout request was created.
+          description: Details about the Payout Target for which the Payout Request was created.
         status:
           type: string
           enum:
             - processing
             - approved
             - cancelled
-          description: Status of the payout request.
+          description: Status of the Payout Request.
         statusMessage:
           type: string
-          description: Gives further detail on the status of the payout request. Only present when status is "cancelled".
+          description: Gives further detail on the status of the Payout Request. Only present when status is "cancelled".
         amount:
           type: number
-          description: Amount to collect from the customer’s payment method. Must be an integer.
+          description: Amount to send to the customer’s Payout Target. Must be an integer.
+          example: 100000
         amountSent:
           type: number
-          description: Amount sent by payout request. Starts at amount and changes to 0 if cancelled.
+          description: Amount sent by Payout Request. Starts at amount and changes to 0 if cancelled.
+          example: 100000
         fee:
           type: number
           description: Fee charged for the transaction. This fee will be subtracted from amountCollected at settlement time.
+          example: 500
+        sourceMerchantAccountId:
+          type: string
+          description: Reference to Merchant Account. Safe to ignore if Merchant Accounts are not being used.
         createdAt:
           type: string
-          description: ISO string when the payout request was created.
+          format: date-time
+          description: ISO string indicating when the Payout Request was created.
         updatedAt:
           type: string
-          description: ISO string when the payout request was last updated.
+          format: date-time
+          description: ISO string indicating when the Payout Request was last updated.
       required:
         - id
         - sourceMerchantAccountId

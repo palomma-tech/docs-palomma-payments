@@ -4,21 +4,11 @@ title: One-Time Payin
 
 1. **Create a [Customer](/api-documentation/customers/create)**
 
-<Tip>
-  Store the `id` of the `Customer` object. You will need it to create the `Payin
-  Link`.
-</Tip>
-
 2. **Create a [Payin Link](/api-documentation/payinLinks/create)**
-
-<Tip>
-  Store the `id` of the `Payin Link` object. When the payment is complete, you
-  will receive a webhook event referencing this `id`.
-</Tip>
 
 3. **Redirect the customer**
 
-The `Payin Link` has an attribute `paymentUrl`. This is the url where the user will fill in their payment information and approve the payment. When the customer completes the auth flow, Palomma will redirect the user back to the `redirectUrl` you provided when creating the `Payin Link`.
+The `Payin Link` has an attribute `paymentUrl`. This is the url where the user will fill in their payment information and approve the payment. When the customer completes the payment flow, Palomma will redirect the user back to the `redirectUrl` you provided when creating the `Payin Link`.
 
 4. **Wait for webhook notification**
 
