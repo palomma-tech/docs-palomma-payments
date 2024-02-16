@@ -1,0 +1,33 @@
+---
+title: Merchant Accounts
+---
+
+<Note>
+  Merchant Accounts not relevant for most merchants. They are an advanced
+  feature. Contact the Palomma team if you have questions or want to create more
+  Merchant Accounts.
+</Note>
+
+## What is a Merchant Account?
+
+A `Merchant Account` is a virtual account that allow a merchant to discriminate balances within Palomma.
+
+## The default Merchant Account
+
+Every merchant has a default `Merchant Account`. The balance of this `Merchant Account` is the net between payins and payouts that the merchant has made.
+
+## Example use case for more Merchant Accounts:
+
+**I am a merchant with three business clients (A, B, C). I process payments for these business clients and want to keep their money separate to make my bookkeeping easier.**
+
+In this case, you can create three `Merchant Accounts` (one for each business client). Assume the ids of these `Merchant Accounts` are `"MA-A"`, `"MA-B"`, `"MA-C"`.
+
+When you create `Payin Links` and `Payin Requests`, you can specify the `targetMerchantAccountId`. So `targetMerchantAccountId = "MA-A"` means that the payin amount will be added to business client A's balance.
+
+Similarly, when you create `Payout Requests`, you can specify the `sourceMerchantAccountId`. So `sourceMerchantAccountId = "MA-A"` means that the payout amount will be subtracted from business client A's balance.
+
+Specifying the `Merchant Accounts` in this way allows you to keep separate balances for each of the business clients.
+
+## Automated withdrawl of funds from Merchant Account
+
+With the normal behavior of a Merchant Account, the balance stays in your Merchant Account until you choose to withdraw those funds. If you want funds to be automatically withdrawn to a target bank account every day, we can configure this for you. Contact us!
